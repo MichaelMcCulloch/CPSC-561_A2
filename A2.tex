@@ -4,18 +4,50 @@
 
 \documentclass[11pt]{article}
 \usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \begin{document}
 \maketitle
 
 \section{}
-\subsection{} 
-\lstinputlisting[language=Java]{code/1a.java}
-
-\subsection{}
-\lstinputlisting[language=Java]{code/1b.java}
-
-\subsection{}
-\lstinputlisting[language=Java]{code/1c.java}
+For all of the following algorithms, they are each wait-free, as they do not contain a loop.
+\begin{itemize}
+    \item
+    \begin{algorithm}
+        \caption{CAS from SCAS}
+        \begin{algorithmic}[1]
+        \Function{$CAS_p$}{old,new}
+            \State SCAS.scas($<\texttt{p, old}>, <\texttt{p, new>}$)
+            \State $<\texttt{p', new'>}$ = SCAS.read()
+            \State \Return{ \{ (p' = p) \textbf{AND} (new' = new) \}}
+        \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+    \item
+    \begin{algorithm}
+        \caption{SCAS from CAS}
+        \begin{algorithmic}[1]
+        \Function{$SCAS_p$}{old,new}
+            \State $< \texttt{p', oldValue} >$ = CAS.read()
+            \State CAS.cas($<\texttt{p, old}>, <\texttt{p, new>}$)
+            \State \Return{ oldValue }
+        \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+    \item 
+    \begin{algorithm}
+        \caption{CAS from LL/SC}
+        \begin{algorithmic}[1]
+            \Function{$CAS_p$}{old, new}
+                \State{old' = LL/SC.LL();}
+                \If{old' $\neq$ old}
+                    \State \Return false
+                \EndIf
+                \State \Return LL/SC.SC(new)
+            \EndFunction
+        \end{algorithmic}
+    \end{algorithm}
+\end{itemize}
 
 \section{Consensus}
 
