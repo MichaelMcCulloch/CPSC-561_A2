@@ -55,13 +55,13 @@ For all of the following algorithms, they are each wait-free, as they do not con
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-\paragraph{} \textit{Claim:} If a process P executes lines two through six, before another process Q executes the same, then P's invocation is ordered before Q's. \textit{Proof:} If P returns \texttt{false}, then another process must have executed either LL() or SC() successfully....?
+\paragraph{} \textit{Claim:} If a process P executes lines two through six, before another process Q executes the same, then P's invocation is ordered before Q's. \textit{Proof:} If P returns \texttt{false}, then another process must have executed either LL() or SC() successfully ...FILL IN THE BLANK...?
 
 \section{$\mathbb{Z}_k$-Counter}
 \paragraph{Claim:} There is no consensus-3 solution using $\mathbb{Z}_k$-counters.
 Proof by cases for 3 processes: A, B and C.
 \subsection{Case: Different $\mathbb{Z}_k$-counters}
-    w.l.o.g. assume A and B increment different $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment their own counters....?
+    w.l.o.g. assume A and B increment different $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment their own counters ...FILL IN THE BLANK... then $\pi_A(K)$ and $\pi_A\pi_B(K)$ are indistinguishable to A
 \subsection{Case: Different/Same Registers} 
     \textit{See proof in lecture notes.}
 \subsection{Case: Same $\mathbb{Z}_k$-counters}
