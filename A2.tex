@@ -6,6 +6,7 @@
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{amsfonts}
 \begin{document}
 \maketitle
 
@@ -56,7 +57,15 @@ For all of the following algorithms, they are each wait-free, as they do not con
 \end{algorithm}
 \paragraph{} \textit{Claim:} If a process P executes lines two through six, before another process Q executes the same, then P's invocation is ordered before Q's. \textit{Proof:} If P returns \texttt{false}, then another process must have executed either LL() or SC() successfully....?
 
-\section{Consensus}
+\section{$\mathbb{Z}_k$-Counter}
+\paragraph{Claim:} There is no consensus-3 solution using $\mathbb{Z}_k$-counters.
+Proof by cases for 3 processes: A, B and C.
+\subsection{Case: Different $\mathbb{Z}_k$-counters}
+    w.l.o.g. assume A and B increment different $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment their own counters....?
+\subsection{Case: Different/Same Registers} 
+    \textit{See proof in lecture notes.}
+\subsection{Case: Same $\mathbb{Z}_k$-counters}
+    A and B increment A $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment the counter. Assume for contradiction that $\pi_R$ causes the configuration to be $R$-critical. If the counter's initial value is $c$, then $\pi_A(K)$ causes it to be $c+1$ mod $k$. the same is true for $\pi_B(K)$. Hence, after $\pi_A\pi_B(K)$, the value of the counter is $c+2$ mod $k$ and the same is true for $\pi_B\pi_A(K)$. Therefor, to a third process C, these two states are identical, and therefor are not critical, yielding a contradiction.
 
 \section{SRSW}
 
