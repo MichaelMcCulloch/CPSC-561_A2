@@ -9,45 +9,52 @@
 \begin{document}
 \maketitle
 
-\section{}
+\section{LL/SC}
 For all of the following algorithms, they are each wait-free, as they do not contain a loop.
-\begin{itemize}
-    \item
-    \begin{algorithm}
-        \caption{CAS from SCAS}
-        \begin{algorithmic}[1]
-        \Function{$CAS_p$}{old,new}
-            \State SCAS.scas($<\texttt{p, old}>, <\texttt{p, new>}$)
-            \State $<\texttt{p', new'>}$ = SCAS.read()
-            \State \Return{ \{ (p' = p) \textbf{AND} (new' = new) \}}
-        \EndFunction
-        \end{algorithmic}
-    \end{algorithm}
-    \item
-    \begin{algorithm}
-        \caption{SCAS from CAS}
-        \begin{algorithmic}[1]
-        \Function{$SCAS_p$}{old,new}
-            \State $< \texttt{p', oldValue} >$ = CAS.read()
-            \State CAS.cas($<\texttt{p, old}>, <\texttt{p, new>}$)
-            \State \Return{ oldValue }
-        \EndFunction
-        \end{algorithmic}
-    \end{algorithm}
-    \item 
-    \begin{algorithm}
-        \caption{CAS from LL/SC}
-        \begin{algorithmic}[1]
-            \Function{$CAS_p$}{old, new}
-                \State{old' = LL/SC.LL();}
-                \If{old' $\neq$ old}
-                    \State \Return false
-                \EndIf
+\subsection*{A) CAS from SCAS}
+\begin{algorithm}
+    \caption{CAS from SCAS}
+    \begin{algorithmic}[1]
+    \Function{$CAS_p$}{old,new}
+        \State old' = SCAS.scas(old, new)
+        \State \Return old' = old
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\paragraph{} Let the invocation of SCAS.scas() be the linearization point X. \textit{Claim:} If a process P executes X before another process Q executes X, then the invocation of P is ordered before the invocation of Q. \textit{Proof:} By the definition of SCAS, if it returns the same value as it's first argument, it must have succeeded. If this value is different, another process Q must have finished it's invocation between the invocation of SCAS and the assignment of it's result to old' within P, a contradiction.
+
+\pagebreak
+\subsection*{B) SCAS from CAS}
+\begin{algorithm}
+    \caption{SCAS from CAS}
+    \begin{algorithmic}[1]
+    \Function{$SCAS_p$}{old,new}
+        \State success = CAS.cas(old, new)
+        \If{success}
+            \State \Return old
+        \Else 
+            \State \Return CAS.read()
+        \EndIf
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\paragraph{} Let the invocation of CAS.cas() be the linearization point X. \textit{Claim: see above}. \textit{Proof:} If CAS is successful, then the old value passed in must be the old value. If CAS is unsuccessful, then a different value must have been the old value, which can only have been cause if another process executed X first. A contradiction.
+
+\subsection*{C) CAS from LL/SC} 
+\begin{algorithm}
+    \caption{CAS from LL/SC}
+    \begin{algorithmic}[1]
+        \Function{$CAS_p$}{old, new}
+            \State old' = LL/SC.LL()
+            \If{old' $\neq$ old}
+                \State \Return false
+            \Else
                 \State \Return LL/SC.SC(new)
-            \EndFunction
-        \end{algorithmic}
-    \end{algorithm}
-\end{itemize}
+            \EndIf
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\paragraph{} \textit{Claim:} If a process P executes lines two through six, before another process Q executes the same, then P's invocation is ordered before Q's. \textit{Proof:} If P returns \texttt{false}, then another process must have executed either LL() or SC() successfully....?
 
 \section{Consensus}
 
