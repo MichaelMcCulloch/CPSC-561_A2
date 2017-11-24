@@ -7,66 +7,55 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsfonts}
+\lstset
+{ %Formatting for code in appendix
+    language=Java,
+    basicstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=1,
+    breaklines=true,
+    breakatwhitespace=false,
+}
+
 \begin{document}
 \maketitle
 
 \section{LL/SC}
+
+
 For all of the following algorithms, they are each wait-free, as they do not contain a loop.
 \subsection*{A) CAS from SCAS}
-\begin{algorithm}
-    \caption{CAS from SCAS}
-    \begin{algorithmic}[1]
-    \Function{$CAS_p$}{old,new}
-        \State old' = SCAS.scas(old, new)
-        \State \Return old' = old
-    \EndFunction
-    \end{algorithmic}
-\end{algorithm}
-\paragraph{} Let the invocation of SCAS.scas() be the linearization point X. \textit{Claim:} If a process P executes X before another process Q executes X, then the invocation of P is ordered before the invocation of Q. \textit{Proof:} By the definition of SCAS, if it returns the same value as it's first argument, it must have succeeded. If this value is different, another process Q must have finished it's invocation between the invocation of SCAS and the assignment of it's result to old' within P, a contradiction.
+\lstinputlisting[language=Java]{Code/1A.java}
+\paragraph{} Let the invocation of SCAS.scas() be the linearization point X. \textit{Claim:} If a process P executes X before another process Q executes X, then the invocation of P is ordered before the invocation of Q. \textit{Proof:} By the definition of SCAS, if it returns the same value as it's first argument, it must have succeeded. If this value is different, another process Q must have finished it's invocation before the P's invocation of SCAS and after the assignment of it's result to \texttt{last}, a contradiction.
 
 \pagebreak
 \subsection*{B) SCAS from CAS}
-\begin{algorithm}
-    \caption{SCAS from CAS}
-    \begin{algorithmic}[1]
-    \Function{$SCAS_p$}{old,new}
-        \State success = CAS.cas(old, new)
-        \If{success}
-            \State \Return old
-        \Else 
-            \State \Return CAS.read()
-        \EndIf
-    \EndFunction
-    \end{algorithmic}
-\end{algorithm}
+\lstinputlisting[language=Java]{Code/1B.java}
 \paragraph{} Let the invocation of CAS.cas() be the linearization point X. \textit{Claim: see above}. \textit{Proof:} If CAS is successful, then the old value passed in must be the old value. If CAS is unsuccessful, then a different value must have been the old value, which can only have been cause if another process executed X first. A contradiction.
 
 \subsection*{C) CAS from LL/SC} 
-\begin{algorithm}
-    \caption{CAS from LL/SC}
-    \begin{algorithmic}[1]
-        \Function{$CAS_p$}{old, new}
-            \State old' = LL/SC.LL()
-            \If{old' $\neq$ old}
-                \State \Return false
-            \Else
-                \State \Return LL/SC.SC(new)
-            \EndIf
-        \EndFunction
-    \end{algorithmic}
-\end{algorithm}
-\paragraph{} \textit{Claim:} If a process P executes lines two through six, before another process Q executes the same, then P's invocation is ordered before Q's. \textit{Proof:} If P returns \texttt{false}, then another process must have executed either LL() or SC() successfully ...FILL IN THE BLANK...?
+\lstinputlisting[language=Java]{Code/1C.java}
+\paragraph{} Let the invocation of \texttt{LLSC.ll()} be the linearization point X. \textit{Claim:} If a process P executes X after another process Q, then it is ordered after Q. \textit{Proof:} If any process P executes \texttt{LLSC.ll()} at $t$, then the only next successfull invocation of \texttt{LLSC.sc()} will be its own at $t'$, unless another process Q has executed \texttt{LLSC.ll()} between $t$ and $t'$, in which case Q will be the successfull one.
 
 \section{$\mathbb{Z}_k$-Counter}
-\paragraph{Claim:} There is no consensus-3 solution using $\mathbb{Z}_k$-counters.
+\paragraph{Claim:} There is no Consensus-3 solution using $\mathbb{Z}_k$-counters.
 Proof by cases for 3 processes: A, B and C.
 \subsection{Case: Different $\mathbb{Z}_k$-counters}
     w.l.o.g. assume A and B increment different $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment their own counters ...FILL IN THE BLANK... then $\pi_A(K)$ and $\pi_A\pi_B(K)$ are indistinguishable to A
 \subsection{Case: Different/Same Registers} 
     \textit{See proof in lecture notes.}
 \subsection{Case: Same $\mathbb{Z}_k$-counters}
-    A and B increment A $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment the counter. Assume for contradiction that $\pi_R$ causes the configuration to be $R$-critical. If the counter's initial value is $c$, then $\pi_A(K)$ causes it to be $c+1$ mod $k$. the same is true for $\pi_B(K)$. Hence, after $\pi_A\pi_B(K)$, the value of the counter is $c+2$ mod $k$ and the same is true for $\pi_B\pi_A(K)$. Therefor, to a third process C, these two states are identical, and therefor are not critical, yielding a contradiction.
+    A and B increment A $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_B$ be the steps that A and B take, respectively, to increment the counter. Assume for contradiction that $\pi_R$ causes the configuration to be $R$-univalent. If the counter's initial value is $c$, then $\pi_A(K)$ causes it to be $c+1$ mod $k$. the same is true for $\pi_B(K)$. Hence, after $\pi_A\pi_B(K)$, the value of the counter is $c+2$ mod $k$ and the same is true for $\pi_B\pi_A(K)$. Therefor, to a third process C, these two states are identical, and therefor are not univalent, yielding a contradiction.
 
 \section{SRSW}
+\subsection{A} 
+Run $W_1$, $W_2$: if c $\geq$ 5 then run $R_1$, $W_3$ else run $W_3$, $R_1$\\
+There are two ways in which $r$ may read 5, but no ways it may read 6
+Expected Value = (1/6) * 1 + (1/6) * 2 + (1/6) * 3 + (1/6) * 4 + (2/6) * 5 
+Expected Value = (1/6) * 10 + (2/6) * 5
+Expected Value = 20/6 = 3.3
 
+\subsection{B}
 \end{document}
