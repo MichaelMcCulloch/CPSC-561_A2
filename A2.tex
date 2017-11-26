@@ -2,11 +2,13 @@
 \author{Michael McCulloch}
 \date{}
 
-\documentclass[11pt]{article}
+\documentclass[10pt, letterpaper]{article}
+\usepackage[letterpaper,margin=0.75in]{geometry}
 \usepackage{listings}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{amsfonts}
+\usepackage{enumitem}
 \lstset
 { %Formatting for code in appendix
     language=Java,
@@ -30,32 +32,76 @@ For all of the following algorithms, they are each wait-free, as they do not con
 \lstinputlisting[language=Java]{Code/1A.java}
 \paragraph{} Let the invocation of SCAS.scas() be the linearization point X. \textit{Claim:} If a process P executes X before another process Q executes X, then the invocation of P is ordered before the invocation of Q. \textit{Proof:} By the definition of SCAS, if it returns the same value as it's first argument, it must have succeeded. If this value is different, another process Q must have finished it's invocation before the P's invocation of SCAS and after the assignment of it's result to \texttt{last}, a contradiction.
 
-\pagebreak
 \subsection*{B) SCAS from CAS}
 \lstinputlisting[language=Java]{Code/1B.java}
-\paragraph{} Let the invocation of CAS.cas() be the linearization point X. \textit{Claim: see above}. \textit{Proof:} If CAS is successful, then the old value passed in must be the old value. If CAS is unsuccessful, then a different value must have been the old value, which can only have been cause if another process executed X first. A contradiction.
+\paragraph{} Let the invocation of CAS.cas() be the linearization point X. \textit{Claim: see above}. \textit{Proof:} If CAS is successful, then the old value passed in must be the old value. If CAS is unsuccessful, then a different value must have been the old value, which can only be the case if another process executed X first. A contradiction.
 
 \subsection*{C) CAS from LL/SC} 
 \lstinputlisting[language=Java]{Code/1C.java}
-\paragraph{} Let the invocation of \texttt{LLSC.ll()} be the linearization point X. \textit{Claim:} If a process P executes X after another process Q, then it is ordered after Q. \textit{Proof:} If any process P executes \texttt{LLSC.ll()} at $t$, then the only next successfull invocation of \texttt{LLSC.sc()} will be its own at $t'$, unless another process Q has executed \texttt{LLSC.ll()} between $t$ and $t'$, in which case Q will be the successfull one.
+\paragraph{} Let the invocation of \texttt{LLSC.ll()} be the linearization point X. \textit{Claim:} If a process P executes X after another process Q, then it is ordered after Q. \textit{Proof:} If any process P executes \texttt{LLSC.ll()} at $t$, then the only next successfull invocation of \texttt{LLSC.sc()} will be P's at $t'$, unless another process Q has executed \texttt{LLSC.ll()} between $t$ and $t'$, in which case Q's invocation of \texttt{LLSC.sc()} will be the successful one.
+
 
 \section{$\mathbb{Z}_k$-Counter}
-\paragraph{Claim:} There is no Consensus-3 solution using $\mathbb{Z}_k$-counters.
-Proof by cases for 3 processes: A, B and C.
-\subsection{Case: Different $\mathbb{Z}_k$-counters}
-    w.l.o.g. assume A and B increment different $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_b$ be the steps that A and B take, respectively, to increment their own counters ...FILL IN THE BLANK... then $\pi_A(K)$ and $\pi_A\pi_B(K)$ are indistinguishable to A
-\subsection{Case: Different/Same Registers} 
-    \textit{See proof in lecture notes.}
-\subsection{Case: Same $\mathbb{Z}_k$-counters}
-    A and B increment A $\mathbb{Z}_k$-counters. Let $K$ be a bivalent configuration, $\pi_A$ and $\pi_B$ be the steps that A and B take, respectively, to increment the counter. Assume for contradiction that $\pi_R$ causes the configuration to be $R$-univalent. If the counter's initial value is $c$, then $\pi_A(K)$ causes it to be $c+1$ mod $k$. the same is true for $\pi_B(K)$. Hence, after $\pi_A\pi_B(K)$, the value of the counter is $c+2$ mod $k$ and the same is true for $\pi_B\pi_A(K)$. Therefor, to a third process C, these two states are identical, and therefor are not univalent, yielding a contradiction.
+Solution for consensus no. 2:
+\begin{algorithm}
+\caption{Decision procedure 2 processes}\label{euclid}
+\begin{algorithmic}[1]
+\Procedure{Decide$_i$}{}
+    \State $Val[i] \gets V_i$
+    \State $x\gets Z_k.Inc() \bmod 2$
+    \If{$x = 0$}
+        \State \textbf{return} $Val[i]$
+    \Else
+        \State \textbf{return} $Val[1 - i]$
+    \EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{} \textit{Claim:} No consensus-3 solution exists using only $Z_k$ counters and registers. \textit{Proof by cases:} 
+\begin{enumerate}
+    \item 
+\end{enumerate}
+For three processes, A, B and C let X be a critical configureation and $\pi_I$ be the step that process $I$ takes to increment the counter. Then to a third process C, the branches $\pi_A\pi_B(X)$ and $\pi_B\pi_A(X)$ are indistinguishable, which contradicts X being critical.
 
 \section{SRSW}
 \subsection{A} 
-Run $W_1$, $W_2$: if c $\geq$ 5 then run $R_1$, $W_3$ else run $W_3$, $R_1$\\
-There are two ways in which $r$ may read 5, but no ways it may read 6
-Expected Value = (1/6) * 1 + (1/6) * 2 + (1/6) * 3 + (1/6) * 4 + (2/6) * 5 
-Expected Value = (1/6) * 10 + (2/6) * 5
-Expected Value = 20/6 = 3.3
-
+\begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+    \item $w$ : W.write(5)
+    \item $w$ : choose c
+    \item[\texttt{IF}] c $\geq$ 5 \texttt{THEN}
+    \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+        \item[3.] $r$ : R.read()
+        \item[4.] $w$ : W.write(c)
+    \end{enumerate}
+    \item[\texttt{ELSE}]
+    \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+        \item[3.] $w$ : W.write(c)
+        \item[4.] $r$ : R.read()
+    \end{enumerate}
+\end{enumerate}
+There are two ways in which $r$ may read 5, but no ways it may read 6 \\
+Expected Value = (1/6)*1 + (1/6)*2 + (1/6)*3 + (1/6)*4 + (2/6)*5 \\
+Expected Value = (1/6) * 10 + (2/6) * 5 \\
+Expected Value = 20/6 = 3.3 \\
 \subsection{B}
+\begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+    \item $r$ : R.read()$_{5-9}$
+    \item $w$ : W.write(5)
+    \item $w$ : choose c
+    \item[\texttt{IF}] c $\geq$ 4 
+    \item[\texttt{THEN:}]  
+    \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+        \item[4.] $r$ : R.read()$_{10-13}$
+        \item[5.] $w$ : W.write(c)
+    \end{enumerate}
+    \item[\texttt{ELSE}:]
+    \begin{enumerate}[topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+        \item[4.] $w$ : W.write(c)
+        \item[5.] $r$ : R.read()$_{10-13}$
+    \end{enumerate}
+\end{enumerate}
+\paragraph{} There are now 3 ways in which $r$ may read 4, and no ways it may read 5 or 6: \\
+Expected Value = (1/6) * (1+2+3) + (3/6) * 4 = 3
+
 \end{document}
